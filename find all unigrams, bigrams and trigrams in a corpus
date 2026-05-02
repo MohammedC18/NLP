@@ -1,0 +1,85 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+
+from nltk.tokenize import word_tokenize
+from collections import Counter
+
+# -------- USER INPUT --------
+corpus_text = input("Enter the corpus text: ")
+test_sentence = input("Enter the sentence to calculate probability: ")
+
+# Preprocess
+tokens = word_tokenize(corpus_text.lower())
+
+# ---------------- UNIGRAMS ----------------
+unigrams = tokens
+unigram_counts = Counter(unigrams)
+
+# ---------------- BIGRAMS ----------------
+bigrams = [(tokens[i], tokens[i+1]) for i in range(len(tokens)-1)]
+bigram_counts = Counter(bigrams)
+
+# ---------------- TRIGRAMS ----------------
+trigrams = [(tokens[i], tokens[i+1], tokens[i+2]) for i in range(len(tokens)-2)]
+trigram_counts = Counter(trigrams)
+
+# Vocabulary size
+vocab_size = len(set(tokens))
+
+# Tokenize input sentence
+test_tokens = word_tokenize(test_sentence.lower())
+
+# -------- SENTENCE PROBABILITY (BIGRAM + LAPLACE) --------
+sentence_probability = 1
+
+for i in range(len(test_tokens)-1):
+    previous_word = test_tokens[i]
+    next_word = test_tokens[i+1]
+    
+    bigram = (previous_word, next_word)
+    
+    bigram_count = bigram_counts[bigram]
+    previous_word_count = unigram_counts[previous_word]
+    
+    probability = (bigram_count + 1) / (previous_word_count + vocab_size)
+    sentence_probability *= probability
+
+# -------- OUTPUT --------
+print("\nUnigram Counts:")
+print(unigram_counts)
+
+print("\nBigram Counts:")
+print(bigram_counts)
+
+print("\nTrigram Counts:")
+print(trigram_counts)
+
+print("\nProbability of given sentence:")
+print(sentence_probability)
+
+
+# -------- EXPLANATION --------
+# corpus_text:
+# User inputs any text to build the language model.
+
+# test_sentence:
+# User inputs a sentence whose probability is calculated.
+
+# Tokenization:
+# Converts text into lowercase words.
+
+# Unigrams, Bigrams, Trigrams:
+# Generated using list comprehension and counted using Counter.
+
+# Probability:
+# Uses Bigram model with Laplace smoothing:
+# P(w2 | w1) = (count(w1,w2) + 1) / (count(w1) + V)
+
+# sentence_probability:
+# Product of all bigram probabilities in the sentence.
+
+# Output:
+# Shows all n-grams and final probability.
