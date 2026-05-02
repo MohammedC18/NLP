@@ -1,0 +1,57 @@
+# Import regex module
+import re
+
+# Sample unstructured text
+t = """
+Hello, my name is Rahul. Contact me at rahul123@gmail.com.
+You can also reach my office at info.company@domain.co.in.
+Random numbers: 12345, 9876543210, 567890.
+Friend's number: +91 9123456789 or 8123456780.
+Invalid email: user@com, test@.com
+Another email: example_user@abc.org
+"""
+
+# Regex pattern for emails
+email_pat = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+
+# Regex pattern for Indian mobile numbers
+mob_pat = r'(\+91[\-\s]?)?[6-9]\d{9}'
+
+# Find all matches
+emails = re.findall(email_pat, t)
+mobs = re.findall(mob_pat, t)
+
+# Since mobile regex may return tuples, extract full numbers properly
+mobs = re.findall(r'(?:\+91[\-\s]?)?[6-9]\d{9}', t)
+
+# Output
+print("Extracted Email Addresses:")
+for e in emails:
+    print("-", e)
+
+print("\nExtracted Indian Mobile Numbers:")
+for m in mobs:
+    print("-", m)
+
+
+# -------- EXPLANATION --------
+# re module:
+# Used for working with Regular Expressions in Python.
+
+# Email Regex:
+# [a-zA-Z0-9._%+-]+  -> matches username (letters, numbers, special chars)
+# @                  -> mandatory '@' symbol
+# [a-zA-Z0-9.-]+     -> matches domain name
+# \.                 -> dot before extension
+# [a-zA-Z]{2,}       -> matches extension like com, org, in (min 2 chars)
+
+# Mobile Number Regex:
+# (\+91[\-\s]?)?     -> optional country code (+91 with space or dash)
+# [6-9]              -> Indian numbers start with 6,7,8,9
+# \d{9}              -> remaining 9 digits (total = 10 digits)
+
+# re.findall():
+# Extracts all matching patterns from the text.
+
+# Output:
+# Emails and mobile numbers are printed as two separate lists.
