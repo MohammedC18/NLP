@@ -1,0 +1,72 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+
+from nltk.tokenize import word_tokenize
+from collections import Counter
+
+# Input text
+t = "I love NLP and I love machine learning"
+
+# Tokenization (convert to lowercase for consistency)
+w = word_tokenize(t.lower())
+
+# ---------------- UNIGRAM MODEL ----------------
+uni = Counter(w)           # count each word
+V = len(set(w))            # vocabulary size
+N = len(w)                 # total words
+
+# Unigram probabilities with Laplace smoothing
+uni_prob = {}
+for word in uni:
+    uni_prob[word] = (uni[word] + 1) / (N + V)
+
+# ---------------- BIGRAM MODEL ----------------
+# Create bigrams
+bigrams = [(w[i], w[i+1]) for i in range(len(w)-1)]
+
+bi = Counter(bigrams)      # count bigrams
+prev = Counter(w[:-1])     # count previous words
+
+# Bigram probabilities with Laplace smoothing
+bi_prob = {}
+for (w1, w2) in bi:
+    bi_prob[(w1, w2)] = (bi[(w1, w2)] + 1) / (prev[w1] + V)
+
+# Output
+print("Words:", w)
+
+print("\nUnigram Probabilities:")
+for k, v in uni_prob.items():
+    print(f"{k} : {v:.4f}")
+
+print("\nBigram Probabilities:")
+for k, v in bi_prob.items():
+    print(f"{k} : {v:.4f}")
+
+
+# -------- EXPLANATION --------
+# Tokenization:
+# Text is converted to lowercase and split into words.
+
+# Unigram Model:
+# Counts frequency of each word using Counter.
+# Probability = (count(word) + 1) / (total words + vocabulary size)
+# Laplace smoothing avoids zero probability.
+
+# Bigram Model:
+# Creates pairs of consecutive words (w1, w2).
+# Counts occurrences of each pair.
+
+# Bigram Probability:
+# P(w2 | w1) = (count(w1, w2) + 1) / (count(w1) + V)
+# where V = vocabulary size
+
+# Smoothing:
+# Add-1 (Laplace) smoothing ensures unseen words/bigrams
+# still get a small probability instead of zero.
+
+# Output:
+# Displays unigram and bigram probabilities.
