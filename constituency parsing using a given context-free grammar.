@@ -1,0 +1,56 @@
+# Install and import
+!pip install nltk
+
+import nltk
+from nltk import CFG
+from nltk.parse import ChartParser
+import matplotlib.pyplot as plt
+
+# -------- DEFINE GRAMMAR --------
+grammar = CFG.fromstring("""
+S -> NP VP
+NP -> Det N | Det Adj N | 'i'
+VP -> V NP | V
+Det -> 'a' | 'the' | 'my'
+N -> 'cat' | 'dog' | 'man' | 'telescope'
+Adj -> 'big' | 'small'
+V -> 'saw' | 'ate' | 'loved'
+""")
+
+# Create parser
+parser = ChartParser(grammar)
+
+# -------- USER INPUT --------
+sentence = input("Enter a sentence: ").lower().split()
+
+# -------- PARSING + VISUALIZATION --------
+trees = list(parser.parse(sentence))
+
+if len(trees) == 0:
+    print("No parse tree found. Check grammar and sentence.")
+else:
+    print("Parse Tree:")
+    trees[0].pretty_print()   # text tree (better formatted)
+
+    # Draw graphical tree (opens window)
+trees[0].pretty_print()
+
+# -------- EXPLANATION --------
+# CFG:
+# Defines sentence structure using grammar rules.
+
+# ChartParser:
+# Parses sentence according to CFG rules.
+
+# pretty_print():
+# Displays tree in structured text format.
+
+# draw():
+# Opens a graphical window showing the parse tree (proper visualization).
+
+# Note:
+# Works best in local Python. In Colab, .draw() may not open properly.
+
+# Example:
+# Input: "the big dog saw a cat"
+# Output: Tree showing NP and VP hierarchy.
