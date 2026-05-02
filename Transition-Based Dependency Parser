@@ -1,0 +1,56 @@
+# -------- IMPROVED TRANSITION-BASED PARSER --------
+
+def transition_parser(words):
+    stack = ["ROOT"]
+    buffer = words.copy()
+    arcs = []
+
+    while buffer or len(stack) > 1:
+        
+        # SHIFT if stack too small
+        if len(stack) < 2:
+            stack.append(buffer.pop(0))
+        
+        # If buffer not empty → SHIFT
+        elif buffer:
+            stack.append(buffer.pop(0))
+        
+        # Apply RIGHT-ARC (simple rule: previous word is head)
+        else:
+            head = stack[-2]
+            dependent = stack[-1]
+            arcs.append((head, dependent))
+            stack.pop()
+
+    return arcs
+
+
+# -------- USER INPUT --------
+sentence = input("Enter a sentence: ").lower().split()
+
+# Run parser
+dependencies = transition_parser(sentence)
+
+# -------- OUTPUT --------
+print("\nDependency Relations (Head -> Dependent):")
+for head, dep in dependencies:
+    print(f"{head} -> {dep}")
+
+
+# -------- EXPLANATION --------
+# Problem in previous code:
+# Everything was getting attached to ROOT due to incorrect arc conditions.
+
+# Fix:
+# We first SHIFT all words to stack,
+# then create RIGHT-ARC relations step by step.
+
+# Logic:
+# Each word depends on the previous word (simplified assumption).
+
+# Output:
+# Produces a chain-like dependency structure instead of ROOT-only links.
+
+# Note:
+# This is still a simplified parser for understanding.
+# Real parsers use ML models to decide actions dynamically.
