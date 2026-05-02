@@ -1,0 +1,85 @@
+# Install and import
+!pip install scikit-learn matplotlib
+
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+
+# -------- SAMPLE DATASET --------
+# You can replace this with your own dataset later
+texts = [
+    "I love this product", "This is amazing", "Very happy with the service",
+    "I hate this", "This is terrible", "Very bad experience",
+    "Excellent quality", "Worst purchase ever", "I am satisfied",
+    "Not good at all"
+]
+
+labels = [
+    "positive", "positive", "positive",
+    "negative", "negative", "negative",
+    "positive", "negative", "positive",
+    "negative"
+]
+
+# -------- TRAIN-TEST SPLIT --------
+X_train, X_test, y_train, y_test = train_test_split(texts, labels, test_size=0.3)
+
+# -------- TEXT VECTORIZATION --------
+vectorizer = CountVectorizer()
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# -------- NAIVE BAYES MODEL --------
+model = MultinomialNB()
+model.fit(X_train_vec, y_train)
+
+# -------- PREDICTION --------
+y_pred = model.predict(X_test_vec)
+
+# -------- EVALUATION --------
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# -------- USER INPUT TEST --------
+user_text = input("\nEnter a sentence for sentiment prediction: ")
+user_vec = vectorizer.transform([user_text])
+prediction = model.predict(user_vec)
+
+print("Predicted Sentiment:", prediction[0])
+
+# -------- VISUALIZATION --------
+plt.figure()
+plt.bar(["Accuracy"], [accuracy])
+plt.title("Naive Bayes Sentiment Analysis Accuracy")
+plt.xlabel("Metric")
+plt.ylabel("Value")
+plt.show()
+
+
+# -------- EXPLANATION --------
+# Dataset:
+# Small sample dataset with positive and negative labels.
+
+# CountVectorizer:
+# Converts text into numerical feature vectors (Bag of Words).
+
+# Naive Bayes:
+# MultinomialNB is used for text classification.
+
+# Training:
+# Model learns patterns from training data.
+
+# Testing:
+# Accuracy and classification report evaluate performance.
+
+# Prediction:
+# User can input a sentence to classify sentiment.
+
+# Visualization:
+# Bar chart shows accuracy of the model.
+
+# Output:
+# Displays accuracy, report, and predicted sentiment.
