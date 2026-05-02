@@ -1,0 +1,65 @@
+# Install and import
+!pip install gensim scikit-learn matplotlib nltk
+
+import nltk
+nltk.download('punkt')
+
+from nltk.tokenize import word_tokenize
+from gensim.models import Word2Vec
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# -------- USER INPUT --------
+text_data = input("Enter text corpus: ")
+
+# Tokenization (convert to lowercase)
+sentences = [word_tokenize(text_data.lower())]
+
+# -------- WORD2VEC MODEL --------
+model = Word2Vec(sentences, vector_size=50, window=2, min_count=1)
+
+# Get word vectors
+words = list(model.wv.index_to_key)
+word_vectors = [model.wv[word] for word in words]
+
+# -------- PCA (DIMENSION REDUCTION) --------
+pca = PCA(n_components=2)
+reduced_vectors = pca.fit_transform(word_vectors)
+
+# -------- VISUALIZATION --------
+plt.figure()
+
+x_coords = reduced_vectors[:, 0]
+y_coords = reduced_vectors[:, 1]
+
+plt.scatter(x_coords, y_coords)
+
+# Annotate words
+for i, word in enumerate(words):
+    plt.annotate(word, (x_coords[i], y_coords[i]))
+
+plt.title("Word2Vec Embeddings Visualized using PCA")
+plt.xlabel("PCA 1")
+plt.ylabel("PCA 2")
+plt.show()
+
+
+# -------- EXPLANATION --------
+# Word2Vec:
+# Learns vector representations (embeddings) of words based on context.
+
+# vector_size:
+# Dimension of word vectors (e.g., 50).
+
+# PCA:
+# Reduces high-dimensional vectors to 2D for visualization.
+
+# Scatter Plot:
+# Each point represents a word.
+# Words with similar meanings appear closer.
+
+# Example:
+# "king" and "queen" will appear near each other.
+
+# Output:
+# Displays a 2D graph showing relationships between words.
