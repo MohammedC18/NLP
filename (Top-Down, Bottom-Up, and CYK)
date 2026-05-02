@@ -1,0 +1,115 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+
+import time
+from nltk import CFG
+from nltk.parse import RecursiveDescentParser, ShiftReduceParser
+
+# -------- GRAMMAR --------
+grammar = CFG.fromstring("""
+S -> NP VP
+NP -> 'i' | 'you' | Det N
+VP -> V NP
+Det -> 'a' | 'the'
+N -> 'cat' | 'dog'
+V -> 'see' | 'like'
+""")
+
+# -------- INPUT --------
+sentence = input("Enter a sentence: ").lower().split()
+
+# -------- TOP-DOWN PARSER --------
+top_down_parser = RecursiveDescentParser(grammar)
+
+print("\n--- Top-Down Parsing (Tree) ---")
+start = time.time()
+for tree in top_down_parser.parse(sentence):
+    tree.pretty_print()   # ✅ VISUAL TREE
+top_down_time = time.time() - start
+print("Time:", top_down_time)
+
+# -------- BOTTOM-UP PARSER --------
+bottom_up_parser = ShiftReduceParser(grammar)
+
+print("\n--- Bottom-Up Parsing (Tree) ---")
+start = time.time()
+for tree in bottom_up_parser.parse(sentence):
+    tree.pretty_print()   # ✅ VISUAL TREE
+bottom_up_time = time.time() - start
+print("Time:", bottom_up_time)
+
+# -------- CYK PARSER (TABLE VISUALIZATION) --------
+from collections import defaultdict
+
+def convert_to_cnf(grammar):
+    cnf = defaultdict(list)
+    for prod in grammar.productions():
+        cnf[prod.rhs()].append(prod.lhs())
+    return cnf
+
+def cyk_parse(words, grammar):
+    n = len(words)
+    table = [[set() for _ in range(n)] for _ in range(n)]
+    cnf = convert_to_cnf(grammar)
+
+    # Fill diagonal
+    for i in range(n):
+        for lhs in cnf[(words[i],)]:
+            table[i][i].add(lhs)
+
+    # Fill upper cells
+    for length in range(2, n+1):
+        for i in range(n-length+1):
+            j = i + length - 1
+            for k in range(i, j):
+                for B in table[i][k]:
+                    for C in table[k+1][j]:
+                        for lhs in cnf[(B, C)]:
+                            table[i][j].add(lhs)
+    return table
+
+print("\n--- CYK Parsing (Table) ---")
+start = time.time()
+cyk_table = cyk_parse(sentence, grammar)
+cyk_time = time.time() - start
+
+# Print CYK table nicely
+n = len(sentence)
+for i in range(n):
+    for j in range(n):
+        if j < i:
+            print("   ", end="\t")
+        else:
+            print(str(cyk_table[i][j]), end="\t")
+    print()
+
+print("Time:", cyk_time)
+
+
+# -------- EXPLANATION --------
+# Top-Down Parsing:
+# Uses RecursiveDescentParser.
+# pretty_print() shows tree structure visually.
+
+# Bottom-Up Parsing:
+# Uses ShiftReduceParser.
+# Also shows tree using pretty_print().
+
+# CYK Algorithm:
+# Uses dynamic programming table.
+# Table[i][j] shows possible non-terminals for substring.
+
+# Visualization:
+# Trees → structured diagrams (easy to understand)
+# CYK → table format (exam-friendly)
+
+# Comparison:
+# Top-Down: simple but slow (backtracking)
+# Bottom-Up: faster but conflicts possible
+# CYK: best for ambiguity, but needs more computation
+
+# Output:
+# Shows trees for both parsers and CYK table.
