@@ -1,0 +1,53 @@
+# Install and import required libraries
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+text = "Natural Language Processing is amazing. It helps computers understand human language efficiently."
+
+# 1. Sentence Tokenization
+sentences = sent_tokenize(text)
+
+# 2. Word Tokenization
+words = word_tokenize(text)
+
+# 3. Stopword Removal
+stop_words = set(stopwords.words('english'))
+filtered_words = [word for word in words if word.lower() not in stop_words]
+
+# 4. Stemming
+stemmer = PorterStemmer()
+stemmed_words = [stemmer.stem(word) for word in filtered_words]
+
+# Output
+print("Original Text:\n", text)
+print("\nSentence Tokens:\n", sentences)
+print("\nWord Tokens:\n", words)
+print("\nAfter Stopword Removal:\n", filtered_words)
+print("\nAfter Stemming:\n", stemmed_words)
+
+
+# -------------------- EXPLANATION --------------------
+# Sentence Tokenization:
+# The input text is split into individual sentences using sent_tokenize().
+
+# Word Tokenization:
+# Each sentence or text is broken into individual words using word_tokenize().
+
+# Stopword Removal:
+# Common words like "is", "the", "in" are removed using NLTK's stopwords list
+# because they do not add much meaning to the text.
+
+# Stemming:
+# Words are reduced to their root/base form using PorterStemmer.
+# Example: "processing" -> "process", "efficiently" -> "effici".
+
+# Final Output:
+# Shows original text, tokenized sentences, tokenized words,
+# words after removing stopwords, and stemmed words.
