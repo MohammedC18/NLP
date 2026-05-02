@@ -1,0 +1,66 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
+nltk.download('maxent_ne_chunker_tab') # Added to resolve LookupError
+
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag, ne_chunk
+from nltk.chunk import RegexpParser
+
+# Input text
+text_data = "Barack Obama visited India and met Prime Minister Narendra Modi in New Delhi."
+
+# Tokenization
+tokenized_words = word_tokenize(text_data)
+
+# POS Tagging
+pos_tagged_words = pos_tag(tokenized_words)
+
+# ---------------- CHUNKING ----------------
+# Grammar for noun phrases
+chunk_grammar = "NP: {<DT>?<JJ>*<NN.*>}"
+
+chunk_parser = RegexpParser(chunk_grammar)
+chunk_tree = chunk_parser.parse(pos_tagged_words)
+
+print("Chunking (Noun Phrases):")
+print(chunk_tree)
+
+# ---------------- NER ----------------
+named_entity_tree = ne_chunk(pos_tagged_words)
+
+print("\nNamed Entity Recognition:")
+print(named_entity_tree)
+
+
+# -------- EXPLANATION --------
+# text_data:
+# Stores the input sentence.
+
+# tokenized_words:
+# List of words obtained after tokenization.
+
+# pos_tagged_words:
+# Each word is assigned a part-of-speech tag.
+
+# Chunking:
+# Uses a grammar rule:
+# NP: {<DT>?<JJ>*<NN.*>}
+# It identifies noun phrases (optional determiner, adjectives, and nouns).
+
+# chunk_tree:
+# Displays grouped noun phrases in tree structure.
+
+# NER:
+# ne_chunk() identifies named entities such as PERSON, LOCATION, ORGANIZATION.
+
+# named_entity_tree:
+# Shows recognized entities like "Barack Obama", "India", "Narendra Modi", etc.
+
+# Output:
+# First shows chunked noun phrases, then named entities.
