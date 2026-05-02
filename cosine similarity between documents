@@ -1,0 +1,51 @@
+# Install and import
+!pip install scikit-learn matplotlib seaborn
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# -------- USER INPUT --------
+doc1 = input("Enter Document 1: ")
+doc2 = input("Enter Document 2: ")
+doc3 = input("Enter Document 3 (optional): ")
+
+documents = [doc1, doc2]
+
+if doc3.strip() != "":
+    documents.append(doc3)
+
+# -------- TF-IDF --------
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# -------- COSINE SIMILARITY --------
+cosine_sim = cosine_similarity(tfidf_matrix)
+
+# -------- PRINT VALUES --------
+print("\nCosine Similarity Matrix:\n", cosine_sim)
+
+# -------- HEATMAP VISUALIZATION --------
+plt.figure()
+sns.heatmap(cosine_sim, annot=True, xticklabels=["Doc1","Doc2","Doc3"][:len(documents)],
+            yticklabels=["Doc1","Doc2","Doc3"][:len(documents)])
+
+plt.title("Cosine Similarity Heatmap (TF-IDF)")
+plt.show()
+
+
+# -------- EXPLANATION --------
+# TF-IDF:
+# Converts documents into numerical vectors based on importance of words.
+
+# Cosine Similarity:
+# Measures similarity between documents (0 to 1 range).
+# 1 = identical, 0 = completely different.
+
+# Heatmap:
+# Visual representation of similarity matrix.
+# Darker color → higher similarity.
+
+# Output:
+# Shows similarity values + heatmap image for better understanding.
