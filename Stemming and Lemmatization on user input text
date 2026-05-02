@@ -1,0 +1,57 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+# -------- USER INPUT --------
+text_data = input("Enter raw text: ")
+
+# Tokenization
+tokenized_words = word_tokenize(text_data.lower())
+
+# -------- STEMMING --------
+stemmer = PorterStemmer()
+stemmed_words = [stemmer.stem(word) for word in tokenized_words]
+
+# -------- LEMMATIZATION --------
+lemmatizer = WordNetLemmatizer()
+lemmatized_words = [lemmatizer.lemmatize(word) for word in tokenized_words]
+
+# -------- OUTPUT --------
+print("\nOriginal Words:")
+print(tokenized_words)
+
+print("\nStemmed Words:")
+print(stemmed_words)
+
+print("\nLemmatized Words:")
+print(lemmatized_words)
+
+
+# -------- EXPLANATION --------
+# text_data:
+# User inputs any raw text.
+
+# tokenized_words:
+# Text is converted to lowercase and split into words.
+
+# Stemming:
+# PorterStemmer reduces words to root form (may not be actual words).
+# Example: "running" -> "run", "studies" -> "studi"
+
+# Lemmatization:
+# WordNetLemmatizer converts words to proper dictionary form.
+# Example: "better" -> "good" (when POS is used), "running" -> "running"/"run"
+
+# Difference:
+# Stemming is faster but less accurate.
+# Lemmatization is slower but more meaningful.
+
+# Output:
+# Displays original, stemmed, and lemmatized words.
