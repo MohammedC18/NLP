@@ -1,0 +1,52 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
+from nltk.stem import WordNetLemmatizer
+
+# Input text
+t = "The striped bats are hanging on their feet and ate best fishes."
+
+# Word Tokenization
+w = word_tokenize(t)
+
+# POS Tagging
+p = pos_tag(w)
+
+# Lemmatization
+lm = WordNetLemmatizer()
+l = [lm.lemmatize(i) for i in w]
+
+# Output
+print("Original Text:\n", t)
+print("\nWords:\n", w)
+print("\nPOS Tags:\n", p)
+print("\nLemmatized Words:\n", l)
+
+
+# -------- EXPLANATION --------
+# t = input text
+# w = list of tokenized words using word_tokenize()
+
+# POS Tagging:
+# pos_tag() assigns grammatical tags to each word
+# Example: NN = noun, VB = verb, JJ = adjective
+
+# Lemmatization:
+# WordNetLemmatizer reduces words to their base (dictionary) form
+# Example: "bats" -> "bat", "fishes" -> "fish"
+
+# Note:
+# Lemmatization works better when POS is provided,
+# but here basic lemmatization is shown for simplicity.
+
+# Output:
+# Displays original text, tokenized words,
+# POS-tagged words, and lemmatized words.
