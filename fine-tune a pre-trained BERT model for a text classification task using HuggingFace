@@ -1,0 +1,109 @@
+# Install libraries (skip if already installed)
+!pip install transformers datasets torch scikit-learn matplotlib
+
+import torch
+from datasets import Dataset
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import numpy as np
+import matplotlib.pyplot as plt
+
+# -------- SAMPLE DATASET --------
+texts = [
+    "I love this product", "This is amazing", "Very happy",
+    "I hate this", "This is terrible", "Very bad",
+    "Excellent service", "Worst experience ever"
+]
+
+labels = [1,1,1,0,0,0,1,0]   # 1 = positive, 0 = negative
+
+# Convert to dataset
+dataset = Dataset.from_dict({"text": texts, "label": labels})
+
+# Train-test split
+dataset = dataset.train_test_split(test_size=0.3)
+
+# -------- TOKENIZER --------
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+
+def tokenize(example):
+    return tokenizer(example["text"], padding="max_length", truncation=True)
+
+dataset = dataset.map(tokenize, batched=True)
+
+# Format for PyTorch
+dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
+
+# -------- MODEL --------
+model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+
+# -------- TRAINING ARGUMENTS (FIXED) --------
+training_args = TrainingArguments(
+    output_dir="./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    do_eval=True,                 # ✅ FIXED
+    logging_dir="./logs"
+)
+
+# -------- METRICS --------
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    preds = np.argmax(logits, axis=1)
+    return {"accuracy": accuracy_score(labels, preds)}
+
+# -------- TRAINER --------
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset["train"],
+    eval_dataset=dataset["test"],
+    compute_metrics=compute_metrics
+)
+
+# -------- TRAIN --------
+trainer.train()
+
+# -------- EVALUATE --------
+results = trainer.evaluate()
+print("\nEvaluation Results:", results)
+
+# -------- USER INPUT --------
+user_text = input("\nEnter text for prediction: ")
+inputs = tokenizer(user_text, return_tensors="pt", truncation=True, padding=True)
+
+outputs = model(**inputs)
+prediction = torch.argmax(outputs.logits, dim=1).item()
+
+print("Predicted Sentiment:", "Positive" if prediction==1 else "Negative")
+
+# -------- VISUALIZATION --------
+plt.figure()
+plt.bar(["Accuracy"], [results["eval_accuracy"]])
+plt.title("BERT Model Accuracy")
+plt.show()
+
+
+# -------- EXPLANATION --------
+# BERT:
+# Pre-trained transformer model used for NLP tasks.
+
+# Tokenizer:
+# Converts text into tokens for BERT.
+
+# Fine-tuning:
+# Model is trained on custom dataset for classification.
+
+# do_eval=True:
+# Fix for new transformers version (replaces evaluation_strategy).
+
+# Trainer:
+# Handles training and evaluation automatically.
+
+# Output:
+# Shows accuracy and predicts sentiment for user input.
+
+# Visualization:
+# Displays model accuracy as a graph.
