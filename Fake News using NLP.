@@ -1,0 +1,68 @@
+# Install
+!pip install scikit-learn matplotlib
+
+# Import
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+
+# -------- LOAD REAL DATASET --------
+data = fetch_20newsgroups(subset='train', categories=['sci.space', 'rec.sport.hockey'])
+
+texts = data.data[:200]   # take only 200 samples (FAST)
+labels = data.target[:200]
+
+# Convert to Fake/Real style
+# 0 → Fake, 1 → Real (just for demo)
+labels = [1 if l == 1 else 0 for l in labels]
+
+# -------- SPLIT --------
+X_train, X_test, y_train, y_test = train_test_split(texts, labels, test_size=0.3)
+
+# -------- TF-IDF --------
+vectorizer = TfidfVectorizer(stop_words='english')
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# -------- MODEL --------
+model = MultinomialNB()
+model.fit(X_train_vec, y_train)
+
+# -------- EVALUATION --------
+y_pred = model.predict(X_test_vec)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+
+# -------- USER INPUT --------
+user_input = input("\nEnter news text: ")
+user_vec = vectorizer.transform([user_input])
+prediction = model.predict(user_vec)
+
+print("Prediction:", "Real News" if prediction[0]==1 else "Fake News")
+
+# -------- VISUALIZATION --------
+plt.figure()
+plt.bar(["Accuracy"], [accuracy])
+plt.title("Fake News Detection (Real Dataset)")
+plt.show()
+
+
+# -------- EXPLANATION --------
+# Dataset:
+# 20 Newsgroups dataset (real-world text data).
+
+# TF-IDF:
+# Converts text into numerical features.
+
+# Naive Bayes:
+# Classifies text into categories.
+
+# Adaptation:
+# Categories converted into Fake/Real for demonstration.
+
+# Output:
+# Shows accuracy and prediction with graph.
