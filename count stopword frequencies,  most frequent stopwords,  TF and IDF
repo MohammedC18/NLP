@@ -1,0 +1,95 @@
+# Install and import
+!pip install nltk
+
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from collections import Counter
+import math
+
+# -------- USER INPUT --------
+corpus_text = input("Enter corpus text (multiple sentences): ")
+query_text = input("Enter query: ")
+
+# Split corpus into sentences (documents)
+documents = nltk.sent_tokenize(corpus_text.lower())
+
+# Stopwords list
+stop_words = set(stopwords.words('english'))
+
+# -------- STOPWORD FREQUENCY --------
+all_tokens = word_tokenize(corpus_text.lower())
+stopword_list = [word for word in all_tokens if word in stop_words]
+
+stopword_counts = Counter(stopword_list)
+
+# Most frequent stopwords (top 5)
+most_common_stopwords = stopword_counts.most_common(5)
+
+# -------- TF CALCULATION --------
+query_tokens = word_tokenize(query_text.lower())
+tf = Counter(query_tokens)
+
+# Normalize TF
+total_terms = len(query_tokens)
+tf_normalized = {term: count/total_terms for term, count in tf.items()}
+
+# -------- IDF CALCULATION --------
+idf = {}
+total_docs = len(documents)
+
+for term in query_tokens:
+    doc_count = sum(1 for doc in documents if term in word_tokenize(doc))
+    idf[term] = math.log((total_docs + 1) / (doc_count + 1)) + 1  # smoothed IDF
+
+# -------- TF-IDF --------
+tf_idf = {}
+for term in query_tokens:
+    tf_idf[term] = tf_normalized.get(term, 0) * idf.get(term, 0)
+
+# -------- OUTPUT --------
+print("\nStopword Frequencies:")
+print(stopword_counts)
+
+print("\nMost Frequent Stopwords:")
+print(most_common_stopwords)
+
+print("\nTF (Normalized):")
+print(tf_normalized)
+
+print("\nIDF:")
+print(idf)
+
+print("\nTF-IDF (Query Term Importance):")
+print(tf_idf)
+
+
+# -------- EXPLANATION --------
+# corpus_text:
+# User provides text which is split into sentences (documents).
+
+# stopword_counts:
+# Counts how many times common stopwords (like "is", "the") appear.
+
+# most_common_stopwords:
+# Top frequent stopwords in the corpus.
+
+# TF (Term Frequency):
+# Measures how often a term appears in the query.
+# TF = (count of term) / (total terms in query)
+
+# IDF (Inverse Document Frequency):
+# Measures importance of term across documents.
+# IDF = log((total_docs + 1) / (doc_count + 1)) + 1
+# Rare terms → higher IDF
+
+# TF-IDF:
+# Combines TF and IDF:
+# TF-IDF = TF × IDF
+# Higher value → more important term in query
+
+# Output:
+# Shows stopword stats and importance of query terms.
